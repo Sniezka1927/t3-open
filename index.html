@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Open in T3 Code</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.5 -apple-system, system-ui, sans-serif; max-width: 32rem; margin: 20vh auto; padding: 0 16px; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<p id="status">Opening the thread in T3 Code…</p>
+<p><a id="link" hidden>Open again</a></p>
+<script>
+  // Only `#threads/<environmentId>/<threadId>` is opened, and only in T3 Code.
+  var target = location.hash.slice(1);
+  var status = document.getElementById("status");
+  if (/^threads\/[A-Za-z0-9%._~-]+\/[A-Za-z0-9%._~-]+$/.test(target)) {
+    var app = "t3code://" + target;
+    var link = document.getElementById("link");
+    link.href = app;
+    link.hidden = false;
+    location.replace(app);
+    setTimeout(function () { status.textContent = "Opened in T3 Code. You can close this tab."; }, 1500);
+  } else {
+    status.textContent = "This link has no T3 thread.";
+  }
+</script>
+</body>
+</html>
