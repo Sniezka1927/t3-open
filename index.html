@@ -9,20 +9,33 @@
   :root { color-scheme: light dark; }
   body { font: 15px/1.5 -apple-system, system-ui, sans-serif; max-width: 32rem; margin: 20vh auto; padding: 0 16px; }
   a { color: inherit; }
+  label { display: block; margin-top: 2rem; opacity: 0.75; font-size: 13px; }
 </style>
 </head>
 <body>
 <p id="status">Opening the thread in T3 Code…</p>
 <p><a id="link" hidden>Open again</a></p>
+<label id="auto" hidden><input type="checkbox" id="autoclose"> Close this tab once T3 Code opens. Turn on after you chose "Always allow" for T3 Code, or it closes the browser's prompt too.</label>
 <script>
   // Only `#threads/<environmentId>/<threadId>` is opened, and only in T3 Code.
   var target = location.hash.slice(1);
   var status = document.getElementById("status");
+  var key = "autoclose";
+  var read = function () { try { return localStorage.getItem(key) === "1"; } catch (e) { return false; } };
+  var write = function (on) { try { on ? localStorage.setItem(key, "1") : localStorage.removeItem(key); } catch (e) {} };
+
   if (/^threads\/[A-Za-z0-9%._~-]+\/[A-Za-z0-9%._~-]+$/.test(target)) {
     var app = "t3code://" + target;
     var link = document.getElementById("link");
+    var box = document.getElementById("autoclose");
     link.href = app;
     link.hidden = false;
+    box.checked = read();
+    box.onchange = function () { write(box.checked); };
+    document.getElementById("auto").hidden = false;
+    // T3 Code taking focus blurs the page. Browsers let a page close a tab with one history entry,
+    // which a tab opened from a Discord link is; Safari may refuse, and then the tab stays.
+    window.addEventListener("blur", function () { if (read()) window.close(); });
     location.replace(app);
     setTimeout(function () { status.textContent = "Opened in T3 Code. You can close this tab."; }, 1500);
   } else {
