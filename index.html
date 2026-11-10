@@ -33,11 +33,20 @@
     box.checked = read();
     box.onchange = function () { write(box.checked); };
     document.getElementById("auto").hidden = false;
-    // T3 Code taking focus blurs the page. Browsers let a page close a tab with one history entry,
-    // which a tab opened from a Discord link is; Safari may refuse, and then the tab stays.
-    window.addEventListener("blur", function () { if (read()) window.close(); });
+    // Browsers let a page close a tab with one history entry, which a tab opened from a Discord link is.
+    // A tab that opened in the background never had focus, so it never blurs: the timer closes it too.
+    var close = function () {
+      if (!read()) return;
+      window.close();
+      setTimeout(function () { status.textContent = "The browser did not let this page close the tab. You can close it."; }, 300);
+    };
+    window.addEventListener("blur", close);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) close(); });
     location.replace(app);
-    setTimeout(function () { status.textContent = "Opened in T3 Code. You can close this tab."; }, 1500);
+    setTimeout(function () {
+      status.textContent = "Opened in T3 Code. You can close this tab.";
+      close();
+    }, 1500);
   } else {
     status.textContent = "This link has no T3 thread.";
   }
